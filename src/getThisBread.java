@@ -1,20 +1,23 @@
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.event.UndoableEditListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-//import javax.swing.plaf.windows.*;
 import java.io.*;
 import java.util.Scanner;
+import java.util.Stack;
 import java.awt.event.*;
 import javax.swing.text.*;
 
 //TODO: change the class name
 
-public class getThisBread extends JFrame implements ActionListener{
+public class getThisBread extends JFrame implements ActionListener{   //undoable edit listener
     //need constructor to instantiate GUI, need bare bones menu w/ maybe save, open file, new/clear
     //should override actionPerformed from action listener
 
     private JFrame frame;
     private JTextArea textarea;
+    private Stack<Integer> undoing = new Stack<Integer>();
+    //private Document txtareaDoc;
 
     public getThisBread() {
 
@@ -41,6 +44,11 @@ public class getThisBread extends JFrame implements ActionListener{
 
 
         textarea = new JTextArea("Edit This!");
+        textarea.setLineWrap(true);
+        textarea.setWrapStyleWord(true);
+
+        //txtareaDoc = textarea.getDocument(); //undo redo stuff
+
 
         //make a menu with basic options as a start
         JMenuBar menubar = new JMenuBar();
@@ -59,8 +67,25 @@ public class getThisBread extends JFrame implements ActionListener{
         //TODO: maybe add print to this if I can figure out how to connect that
         //TODO: add other menus?
 
+        //undo/re-do
+        JMenu menu2 = new JMenu("Undo/Redo");
+        JMenuItem ur1 = new JMenuItem("Undo");        //not functional yet, FINISH
+        ur1.addActionListener(this);
+        menu2.add(ur1);
+        JMenuItem ur2 = new JMenuItem("Redo");
+        ur2.addActionListener(this);
+        menu2.add(ur2);
+
+        //delete/copy/paste
+        JPopupMenu menu3 = new JPopupMenu("Edit:");
+        PopUpEdit(menu3);
+        PopMenuRCListener mlisten = new PopMenuRCListener();  //separate class since must inherit from another class
+        mlisten.popop = menu3;
+        textarea.addMouseListener(mlisten);
+
         frame.setJMenuBar(menubar);
         menubar.add(menu1);
+        menubar.add(menu2);
         menubar.setVisible(true);
         frame.add(textarea);
         frame.setVisible(true);
@@ -79,8 +104,23 @@ public class getThisBread extends JFrame implements ActionListener{
                 break;
             case "Save File":  saveYourFile();
                 break;
+            case "Undo": undoLast();
+                break;
+            case "Redo": redoLast();
+                break;
+            case "Copy": copySel();
+                break;
+            case "Paste": pasteFrom();
+                break;
+            case "Delete": deleteAndCopy();
+                break;
         }
     }
+
+
+
+
+
 
     private void openAFile() {
         //i think the fact that there's a JFileChooser is incredibly neat
@@ -126,6 +166,7 @@ public class getThisBread extends JFrame implements ActionListener{
     }
 
     public void saveYourFile() {  //very similar to openAFile
+
         //File choosers are a life saver
         JFileChooser choose = new JFileChooser();
         //TODO: save as only .txt
@@ -150,9 +191,51 @@ public class getThisBread extends JFrame implements ActionListener{
         }
     }
 
+    public void copySel() {
+        textarea.copy();
+    }
+
+    public void pasteFrom() {
+        textarea.paste();
+    }
+    public void deleteAndCopy() {
+        textarea.cut();
+    }
     public static void main(String[] args)  {
         getThisBread g = new getThisBread();
 
     }
-}
 
+    public static void undoLast() {
+        //TODO: finish
+    }
+
+    public static void redoLast() {
+        //TODO: finish
+    }
+
+
+    public void PopUpEdit(JPopupMenu popop) {
+
+        JMenuItem e1 = new JMenuItem("Copy");
+        e1.addActionListener(this);  //listening to the current object, use this
+        popop.add(e1);
+        JMenuItem e2 = new JMenuItem("Paste");
+        e2.addActionListener(this);
+        popop.add(e2);
+        JMenuItem e3 = new JMenuItem("Delete");
+        e3.addActionListener(this);
+        popop.add(e3);
+        popop.setBorderPainted(true);
+
+    }
+
+
+
+	/*TODO: word wrap within a paper-like space instead of entire window, vertical scrolling, fonts,
+	text sizes, highlighting?*/
+
+    //this edit added: cut, copy, paste pop-up right click menu using a custom mouse listener,
+    //word wrap for window size, skeleton undo/redo
+
+}
