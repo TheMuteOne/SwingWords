@@ -1,5 +1,7 @@
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
@@ -10,13 +12,13 @@ import javax.swing.text.*;
 
 //TODO: change the class name
 
-public class getThisBread extends JFrame implements ActionListener{   //undoable edit listener
-    //need constructor to instantiate GUI, need bare bones menu w/ maybe save, open file, new/clear
+public class getThisBread extends JFrame implements ActionListener, ChangeListener {   //undoable edit listener?
     //should override actionPerformed from action listener
 
     private JFrame frame;
     private JTextArea textarea;
     private Stack<Integer> undoing = new Stack<Integer>();
+    private JSlider slide;
     //private Document txtareaDoc;
 
     public getThisBread() {
@@ -43,9 +45,11 @@ public class getThisBread extends JFrame implements ActionListener{   //undoable
         }
 
 
-        textarea = new JTextArea("Edit This!");
+        textarea = new JTextArea("");
         textarea.setLineWrap(true);
         textarea.setWrapStyleWord(true);
+        Font def = new Font("Calibri Body", Font.PLAIN,14);
+        textarea.setFont(def);
 
         //txtareaDoc = textarea.getDocument(); //undo redo stuff
 
@@ -76,6 +80,16 @@ public class getThisBread extends JFrame implements ActionListener{   //undoable
         ur2.addActionListener(this);
         menu2.add(ur2);
 
+        //FONT SIZE SLIDER WEWEEEEHEE
+        slide = new JSlider(0,75,14);
+        slide.addChangeListener(this);
+        JMenu slideMenu = new JMenu("Font Size");
+        slideMenu.add(slide);
+
+
+
+
+
         //delete/copy/paste
         JPopupMenu menu3 = new JPopupMenu("Edit:");
         PopUpEdit(menu3);
@@ -86,6 +100,7 @@ public class getThisBread extends JFrame implements ActionListener{   //undoable
         frame.setJMenuBar(menubar);
         menubar.add(menu1);
         menubar.add(menu2);
+        menubar.add(slideMenu);
         menubar.setVisible(true);
         frame.add(textarea);
         frame.setVisible(true);
@@ -104,9 +119,9 @@ public class getThisBread extends JFrame implements ActionListener{   //undoable
                 break;
             case "Save File":  saveYourFile();
                 break;
-            case "Undo": undoLast();
+            case "Undo": undoLast();  //TODO
                 break;
-            case "Redo": redoLast();
+            case "Redo": redoLast();  //TODO
                 break;
             case "Copy": copySel();
                 break;
@@ -230,12 +245,22 @@ public class getThisBread extends JFrame implements ActionListener{   //undoable
 
     }
 
+    public void stateChanged(ChangeEvent e)  //slider listener
+    {
+       // l.setText("value of Slider is =" + b.getValue());
+        //System.out.println("hey king");  //okay it quite literally works omg
+        int a  = slide.getValue();
+        Font f = new Font("Calibri Body",Font.PLAIN,a);
+        textarea.setFont(f);
+        
+    }
+
 
 
 	/*TODO: word wrap within a paper-like space instead of entire window, vertical scrolling, fonts,
 	text sizes, highlighting?*/
 
-    //this edit added: cut, copy, paste pop-up right click menu using a custom mouse listener,
-    //word wrap for window size, skeleton undo/redo
+    //this edit added: set default font to Calibri body, working font size slider, not sure what
+    //else since I haven't touched this in a while
 
 }
